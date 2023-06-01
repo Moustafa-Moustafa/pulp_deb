@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('core', '0102_add_domain_relations'),
-        ('deb', '0020_remove_fk_relations_in_packageindex_and_installerfileindex'),
+        ('deb', '0022_alter_aptdistribution_distribution_ptr_and_more'),
     ]
 
     operations = [

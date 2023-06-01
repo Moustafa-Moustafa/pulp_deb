@@ -1037,10 +1037,17 @@ class SourcePackageSerializer(MultipleArtifactContentSerializer):
     def __init__(self, *args, **kwargs):
         """Initializer for DscFileSerializer."""
         super().__init__(*args, **kwargs)
-        self.fields["artifacts"].read_only = True
+        if "artifact" in self.fields:
+            self.fields["artifacts"].read_only = True
 
     def create(self, validated_data):
         """Create DscFileSerializer"""
+        source_package = SourcePackage.objects.filter(
+            source=validated_data["source"],
+            version=validated_data["version"],
+        )
+        if source_package.exists():
+            return source_package.first()
         skip_keys = ["artifact", "files", "checksums_sha1", "checksums_sha256", "checksums_sha512"]
         return super().create({k: validated_data[k] for k in validated_data if k not in skip_keys})
 
@@ -1076,15 +1083,6 @@ class SourcePackageSerializer(MultipleArtifactContentSerializer):
                 _("Invalid relative_path provided '{}', filename '{}' do not match.").format(
                     data["relative_path"], model.derived_dsc_filename()
                 )
-            )
-
-        content = SourcePackage.objects.filter(source=data["source"], version=data["version"])
-        if content.exists():
-            raise ValidationError(
-                _(
-                    "There is already a DSC file with version '{version}' and source name "
-                    "'{source}'."
-                ).format(version=data["version"], source=data["source"])
             )
 
         artifacts = {data["relative_path"]: data["artifact"]}
