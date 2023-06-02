@@ -1,5 +1,6 @@
 # coding=utf-8
 """Utilities for tests for the deb plugin."""
+import hashlib
 import os
 from functools import partial
 from unittest import SkipTest
@@ -325,3 +326,12 @@ def get_local_package_absolute_path(package_name):
     """
     p = Path(__file__).parent.absolute()
     return p.joinpath(f"data/packages/{package_name}")
+
+
+def sha256(file: str) -> str:
+    file_hash = hashlib.sha256()
+    buffer_size = 4 * 1048
+    with open(file, "rb") as f:
+        while chunk := f.read(buffer_size):
+            file_hash.update(chunk)
+    return file_hash.hexdigest()

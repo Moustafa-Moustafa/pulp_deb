@@ -299,6 +299,9 @@ def test_sync_orphan_cleanup_fail(
 
     See: https://github.com/pulp/pulp_deb/issues/690
     """
+    # Ensure the test starts with a clean slate.
+    monitor_task(orphans_cleanup_api_client.cleanup({"orphan_protection_time": 0}).task)
+
     # Create a repository and only retain the latest repository version.
     repo = deb_repository_factory(retain_repo_versions=1)
 

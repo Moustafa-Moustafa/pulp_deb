@@ -5,7 +5,7 @@ import pytest
 import os
 import stat
 
-from pulp_deb.tests.functional.utils import gen_deb_remote, gen_local_deb_remote
+from pulp_deb.tests.functional.utils import gen_deb_remote, gen_local_deb_remote, sha256
 from pulp_smash.utils import execute_pulpcore_python, uuid4
 from pulp_deb.tests.functional.constants import DEB_FIXTURE_STANDARD_REPOSITORY_NAME
 
@@ -14,6 +14,7 @@ from pulpcore.client.pulp_deb import (
     AptRepositorySyncURL,
     ContentGenericContentsApi,
     ContentPackagesApi,
+    ContentSourcePackagesApi,
     DebAptPublication,
     DebVerbatimPublication,
     DistributionsAptApi,
@@ -22,7 +23,6 @@ from pulpcore.client.pulp_deb import (
     RemotesAptApi,
     RepositoriesAptApi,
 )
-
 
 @pytest.fixture
 def apt_client(cid, bindings_cfg):
@@ -63,8 +63,10 @@ def apt_distribution_api(apt_client):
 
 
 @pytest.fixture
-def apt_package_api(apt_client):
+def apt_package_api(apt_client, request):
     """Fixture for APT package API."""
+    if hasattr(request, "param") and request.param == "source":
+        return ContentSourcePackagesApi(apt_client)
     return ContentPackagesApi(apt_client)
 
 
@@ -94,6 +96,19 @@ def deb_generic_content_factory(apt_generic_content_api, gen_object_with_cleanup
         return gen_object_with_cleanup(apt_generic_content_api, **kwargs)
 
     return _deb_generic_content_factory
+
+@pytest.fixture
+def deb_artifact_factory(artifacts_api_client, gen_object_with_cleanup):
+    """Fixture that generates artifacts with cleanup."""
+
+    def _deb_artifact_factory(**kwargs):
+        file_sha256 = sha256(kwargs["file"])
+        resp = artifacts_api_client.list(sha256=file_sha256)
+        if resp.count > 0:
+            return resp.results[0]
+        return gen_object_with_cleanup(artifacts_api_client, **kwargs)
+
+    return _deb_artifact_factory
 
 
 @pytest.fixture

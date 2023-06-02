@@ -126,6 +126,12 @@ DEB_REPORT_CODE_SKIP_RELEASE = "sync.release_file.was_skipped"
 DEB_REPORT_CODE_SKIP_PACKAGE = "sync.package_index.was_skipped"
 
 DEB_PACKAGE_RELPATH = "frigg_1.0_ppc64.deb"
+DEB_SOURCE_PACKAGE_RELPATH = "hello_2.10-2ubuntu2.dsc"
+DEB_SOURCE_PACKAGE_ARTIFACTS = [
+    DEB_SOURCE_PACKAGE_RELPATH,
+    "hello_2.10-2ubuntu2.debian.tar.xz",
+    "hello_2.10.orig.tar.gz",
+]
 DEB_GENERIC_CONTENT_RELPATH = "dists/ragnarok/asgard/binary-armeb/Release"
 DEB_GENERIC_CONTENT_URL = urljoin(DEB_FIXTURE_URL, DEB_GENERIC_CONTENT_RELPATH)
 

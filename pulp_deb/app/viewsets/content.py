@@ -535,6 +535,7 @@ class SourcePackageFilter(ContentFilter):
             "maintainer",
             "uploaders",
             "homepage",
+            "relative_path",
             "vcs_browser",
             "vcs_arch",
             "vcs_bzr",
