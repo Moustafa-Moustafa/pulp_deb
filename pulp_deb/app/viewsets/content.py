@@ -159,6 +159,18 @@ class PackageToReleaseComponentFilter(ContentRelationshipFilter):
         return qs.filter(deb_packagereleasecomponent__in=prc_qs)
 
 
+class SourcePackageToReleaseComponentFilter(ContentRelationshipFilter):
+    HELP = "Filter results where SourcePackage in ReleaseComponent"
+    ARG = "release_component_href"
+    ARG_CLASS = models.ReleaseComponent
+
+    def _filter(self, qs, arg, rv_content):
+        sprc_qs = models.SourcePackageReleaseComponent.objects.filter(
+            pk__in=rv_content, release_component=arg.pk
+        )
+        return qs.filter(deb_sourcepackagereleasecomponent__in=sprc_qs)
+
+
 class PackageToReleaseFilter(ContentRelationshipFilter):
     HELP = "Filter results where Package in Release"
     ARG = "release_href"
@@ -169,6 +181,18 @@ class PackageToReleaseFilter(ContentRelationshipFilter):
             pk__in=rv_content, release_component__distribution=arg.distribution
         )
         return qs.filter(deb_packagereleasecomponent__in=prc_qs)
+
+
+class SourcePackageToReleaseFilter(ContentRelationshipFilter):
+    HELP = "Filter results where SourcePackage in Release"
+    ARG = "release_href"
+    ARG_CLASS = models.Release
+
+    def _filter(self, qs, arg, rv_content):
+        sprc_qs = models.SourcePackageReleaseComponent.objects.filter(
+            pk__in=rv_content, release_component__distribution=arg.distribution
+        )
+        return qs.filter(deb_sourcepackagereleasecomponent__in=sprc_qs)
 
 
 class PackageFilter(ContentFilter):
@@ -523,6 +547,9 @@ class SourcePackageFilter(ContentFilter):
     """
     FilterSet for Debian Source Packages.
     """
+
+    release_component = SourcePackageToReleaseComponentFilter()
+    release = SourcePackageToReleaseFilter()
 
     class Meta:
         model = models.SourcePackage
